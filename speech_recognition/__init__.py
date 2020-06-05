@@ -843,7 +843,7 @@ class Recognizer(AudioSource):
         if hypothesis is not None: return hypothesis.hypstr
         raise UnknownValueError()  # no transcriptions available
 
-    def recognize_google(self, audio_data, key=None, language="en-US", pfilter=0, show_all=False):
+    def recognize_google(self, audio_data, model="default", key=None, language="en-US", pfilter=0, show_all=False):
         """
         Performs speech recognition on ``audio_data`` (an ``AudioData`` instance), using the Google Speech Recognition API.
 
@@ -862,6 +862,7 @@ class Recognizer(AudioSource):
         assert isinstance(audio_data, AudioData), "``audio_data`` must be audio data"
         assert key is None or isinstance(key, str), "``key`` must be ``None`` or a string"
         assert isinstance(language, str), "``language`` must be a string"
+        assert model in ["default", "phone_call", "video"], "``model`` must be either 'default', 'phone_call' or 'video'"
 
         flac_data = audio_data.get_flac_data(
             convert_rate=None if audio_data.sample_rate >= 8000 else 8000,  # audio samples must be at least 8 kHz
@@ -871,6 +872,7 @@ class Recognizer(AudioSource):
         url = "http://www.google.com/speech-api/v2/recognize?{}".format(urlencode({
             "client": "chromium",
             "lang": language,
+            "model": model,
             "key": key,
             "pFilter": pfilter
         }))
